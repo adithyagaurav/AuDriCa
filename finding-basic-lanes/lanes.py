@@ -3,7 +3,7 @@ import cv2
 import matplotlib.pyplot as plt
 import imageio
 def make_points(image, line):
-    #print(line[0], line[1])
+    """Convers the line parameters to coordinates"""
     slope, intercept = line
     y1 = int(image.shape[0])
     y2 = int(y1*(3/5))
@@ -12,6 +12,7 @@ def make_points(image, line):
     return ([x1, y1, x2, y2])
 
 def line_fits(image, lines):
+    """Determines the parameters of the detected line and distinguishes them between left and right"""
     left_fit = []
     right_fit = []
     
@@ -26,12 +27,14 @@ def line_fits(image, lines):
             right_fit.append([slope, intercept])
     return left_fit, right_fit
 def canny(image):
+    """Converts grayscale image to canny edge image"""
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
     edge = cv2.Canny(blur, 50, 150)
     return edge
 
 def display_lines(image, lines):
+    """Draws the detected lines and polygon on the road image mask"""
     #left_line, right_line = np.reshape(lines,2)
     line_image = np.zeros_like(image)
     poly_points = []
@@ -51,6 +54,7 @@ def display_lines(image, lines):
     return line_image
 
 def region_of_interest(image):
+    """Segments out the region of interest from the road"""
     height = image.shape[0]
     width = image.shape[1]
     polygon = np.array([[(0, height), (width, height), (int(0.55*width), int(0.6*height)), (int(0.45*width), int(0.6*height))]])
@@ -74,21 +78,21 @@ for frame in video_reader:
     edge = canny(image)
     
     roi = region_of_interest(edge)
-    lines = cv2.HoughLinesP(roi, 2, np.pi/180, 100, np.array([]), minLineLength = 40, maxLineGap = 5)
+    lines = cv2.HoughLinesP(roi, 2, np.pi/180, 100, np.array([]), minLineLength = 40, maxLineGap = 5)   #Finds all the lines in the region of interest
     left_fit, right_fit = line_fits(image, lines)
-    if not len(left_fit) == 0:
-        left_line_average = np.average(left_fit, axis = 0)
+    if not len(left_fit) == 0:    
+        left_line_average = np.average(left_fit, axis = 0)  #Compute the average parameters of newly detected group of left lines
     else:
-        left_line_average = old_left_line_average
-    if not len(right_fit) == 0:
-        right_line_average = np.average(right_fit, axis = 0)
+        left_line_average = old_left_line_average        #if left lines could not be found at all set the parameters average to previous detected left line 
+    if not len(right_fit) == 0:    
+        right_line_average = np.average(right_fit, axis = 0)  #Compute the average parameters of newly detected group of left lines
     else:
-        right_line_average = old_right_line_average
+        right_line_average = old_right_line_average      #if right lines could not be found at all set the parameters average to previous detected right line
     left_line = make_points(image, left_line_average)
     right_line = make_points(image, right_line_average)
-    old_left_line_average = left_line_average
-    old_right_line_average = right_line_average
+    old_left_line_average = left_line_average           #Save a copy of newly detected left line average parameters
+    old_right_line_average = right_line_average         #Save a copy of newly detected right line average parameters
     averaged_lines = ([left_line, right_line])
     line_image = display_lines(image, averaged_lines)
-    output_image = cv2.addWeighted(image, 1, line_image, 0.4,1,0)
+    output_image = cv2.addWeighted(image, 1, line_image, 0.4,1,0)    #Blends the masked image to the undistorted road image
     video_writer.append_data(output_image)
