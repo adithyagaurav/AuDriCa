@@ -64,8 +64,6 @@ def from_sliding_windows(warped, line_left, line_right, processed_frames, nwindo
     h, w = warped.shape[:2]
     
     histogram = np.sum(warped[h//2:, :], axis=0)
-    #plt.plot(histogram)
-    #plt.show()
     output = np.dstack((warped, warped, warped)) * 255
     
     midpoint = len(histogram) // 2
@@ -121,22 +119,11 @@ def from_sliding_windows(warped, line_left, line_right, processed_frames, nwindo
         left_detected=False
     else:
         line_left_pixel = np.polyfit(line_left.all_y, line_left.all_x, 2)
-    #if not list(line_left.all_x) or not list(line_left.all_y):
-    #    line_left_pixel = line_left.last_fit
-    #    detected=False
-    #else:
-    #    line_left_pixel = np.polyfit(line_left.all_y, line_left.all_x, 2)
     if right_positive_window_count < 5:
         line_right_pixel = line_right.average_fit
         right_detected=False
     else:
         line_right_pixel = np.polyfit(line_right.all_y, line_right.all_x, 2)
-    #if not list(line_right.all_x) or not list(line_right.all_y):
-    #    line_right_pixel = line_right.last_fit
-    #    detected=False
-    #else:
-    #    line_right_pixel = np.polyfit(line_right.all_y, line_right.all_x, 2)
-    #print(detected)
     line_left.line_update(line_left_pixel, detected=left_detected)
     
     line_right.line_update(line_right_pixel, detected=right_detected)
@@ -161,61 +148,7 @@ def from_sliding_windows(warped, line_left, line_right, processed_frames, nwindo
 
     return line_left, line_right, output, curvature
 
-def from_previous_fits(warped, line_left, line_right):
-    h,w = warped.shape[:2]
-    line_left_pixel = line_left.last_fit
-    line_right_pixel = line_right.last_fit
 
-    nonzero = warped.nonzero()
-    nonzero_y = np.array(nonzero[0])
-    nonzero_x = np.array(nonzero[1])
-    margin=100
-    left_inds = ((nonzero_x > (line_left_pixel[0] * (nonzero_y ** 2) + line_left_pixel[1] * nonzero_y + line_left_pixel[2] - margin)) & (nonzero_x < (line_left_pixel[0] * (nonzero_y ** 2) + line_left_pixel[1] * nonzero_y + line_left_pixel[2] + margin)))
-    right_inds = ((nonzero_x > (line_right_pixel[0] * (nonzero_y ** 2) + line_right_pixel[1] * nonzero_y + line_right_pixel[2] - margin)) & (nonzero_x < (line_right_pixel[0] * (nonzero_y ** 2) + line_right_pixel[1] * nonzero_y + line_right_pixel[2] + margin)))
-
-    line_left.all_x, line_left.all_y = nonzero_x[left_inds], nonzero_y[left_inds]
-    line_right.all_x, line_right.all_y = nonzero_x[right_inds], nonzero_y[right_inds]
-    detected = True
-    
-    if not list(line_left.all_x) or not list(line_left.all_y):
-        line_left_pixel = line_left.last_fit
-        detected=False
-    else:
-        line_left_pixel = np.polyfit(line_left.all_y, line_left.all_x, 2)
-    
-    if not list(line_right.all_x) or not list(line_right.all_y):
-        line_right_pixel = line_right.last_fit
-        detected=False
-    else:
-        line_right_pixel = np.polyfit(line_right.all_y, line_right.all_x, 2)
-
-    line_left.line_update(line_left_pixel, detected)
-    line_right.line_update(line_right_pixel, detected)
-
-
-    ploty=np.linspace(0, h - 1, h)
-    left_fitx = line_left_pixel[0] * ploty ** 2 + line_left_pixel[1] * ploty + line_left_pixel[2]
-    right_fitx = line_right_pixel[0] * ploty ** 2 + line_right_pixel[1] * ploty + line_right_pixel[2]
-    points = np.empty([len(left_fitx),2])
-    points[:,1]=ploty
-    points[:,0]=left_fitx
-    
-    
-    ym_per_pix = 30/720
-    xm_per_pix = 3.7/700
-
-    y_eval = np.max(ploty)
-    fit_cr_left = np.polyfit(ploty * ym_per_pix, left_fitx * xm_per_pix, 2)
-    curve_left = ((1+(2*line_left_pixel[0] * y_eval/2. + fit_cr_left[1]) ** 2) ** 1.5) / np.absolute(2 * fit_cr_left[0])
-    fit_cr_right = np.polyfit(ploty * ym_per_pix, right_fitx * xm_per_pix, 2)
-    curve_right = ((1+(2*line_right_pixel[0] * y_eval/2. + fit_cr_right[1]) ** 2) ** 1.5) / np.absolute(2 * fit_cr_right[0])
-    curvature = (curve_left + curve_right)/2
-    img_out = np.dstack((warped, warped, warped)) * 255
-
-    img_out[nonzero_y[left_inds], nonzero_x[left_inds]] = [255,0,0]
-    img_out[nonzero_y[right_inds], nonzero_x[right_inds]] = [0,0,255]
-
-    return line_left, line_right, img_out, curvature
 
             
 """line_left = Line()
