@@ -3,6 +3,7 @@ import cv2
 from binarization import convert_to_binary
 import matplotlib.pyplot as plt
 def convert_to_birdeye(image):
+    """Converts the image view to bird's eye view using perspective transformation"""
     h, w = image.shape[:2]
     points1 = np.float32([[w,h-10],[0,h-10],[551,459],[737,459]])
     points2 = np.float32([[w,h],[0,h],[0,0],[w,0]])
