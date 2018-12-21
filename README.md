@@ -5,7 +5,7 @@ This repository contains all my projects that I worked on during my course "The 
 
 Course comprised of three projects: Basic Lane Line Detection, Traffic Sign Classification and Behaviour Cloning a self driving car in the open source Udacity Self Driving Car simulator.
 
-The fourth project Advanced Lane Line Detection on roads was something I took up on my own out of the will to notch it up a little, by following tutorials online.
+The fourth project Advanced Lane Line Detection on roads was something I took up on my own out of the will to notch it up a little.
 
 I hope to add more projects to this repository, pertaining to different utilities of a Self-Driving-Car.
 
