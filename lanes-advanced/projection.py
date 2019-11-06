@@ -2,7 +2,7 @@ import numpy as np
 import cv2
 def final_image_projections(image, Minv, line_left, line_right):
     binary = np.zeros_like(image, dtype=np.uint8)
-    print(binary.shape)
+    #print(binary.shape)
     h,w = image.shape[:2]
     line_left_pixel = line_left.last_fit
     line_right_pixel = line_right.last_fit

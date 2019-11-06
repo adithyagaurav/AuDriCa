@@ -5,11 +5,12 @@ import matplotlib.pyplot as plt
 def convert_to_birdeye(image):
     """Converts the image view to bird's eye view using perspective transformation"""
     h, w = image.shape[:2]
-    points1 = np.float32([[w,h-10],[0,h-10],[551,459],[737,459]])
+    points1 = np.float32([[w,h-10],[0,h-10],[487,459],[780,459]])
     points2 = np.float32([[w,h],[0,h],[0,0],[w,0]])
     M = cv2.getPerspectiveTransform(points1, points2)
     Minv = cv2.getPerspectiveTransform(points2, points1)
     warped =  cv2.warpPerspective(image, M, (w,h),flags=cv2.INTER_LINEAR)
+    #print(warped.shape)
     return warped, M, Minv
 
 """img = cv2.imread("road_images/test6.jpg")
