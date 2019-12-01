@@ -15,7 +15,7 @@ Objective: Involves the detection of lane lines on a straight road using the pop
 
 ![basic-lines](finding-basic-lanes/basic-lines.png)
 
-### [Project 2 - Finding Lane Lines on a curved road](https://github.com/adithyagaurav/AuDriCa/tree/master/lanes-advanced)
+### [Project 2 - Finding Lane Lines on a curved road and monocular depth estimation](https://github.com/adithyagaurav/AuDriCa/tree/master/lanes-advanced)
 
 Objective: Involves the detection of lane lines on a curved (or straight) road, compute vehicle offset and radius of curvature by taking advantage of powerful computer vision techniques such as perspecitve transform and window search method in OpenCV
 
